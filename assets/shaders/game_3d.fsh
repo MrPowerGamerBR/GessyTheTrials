@@ -9,6 +9,8 @@ uniform sampler2D uTexture;
 uniform bool uIsObjectIdPass;
 uniform vec3 uObjectIdRGB;
 uniform bool uUseNormalsAsColor;
+uniform vec4 uFlatColor;
+
 out vec4 FragColor;
 
 void main() {
@@ -24,7 +26,7 @@ void main() {
     }
 
     if (uUseNormalsAsColor) {
-        FragColor = vec4((vNormal.r + 1.0) / 2, (vNormal.g + 1.0) / 2, (vNormal.b + 1.0) / 2, 1.0);
+        FragColor = vec4((vNormal.r + 1.0) / 2.0, (vNormal.g + 1.0) / 2.0, (vNormal.b + 1.0) / 2.0, 1.0);
         return;
     }
 
@@ -34,6 +36,14 @@ void main() {
         discard;
 
     if (true) {
+        if (uFlatColor.a != 0.0) {
+            // Checkboard
+            if ((int(gl_FragCoord.x) + int(gl_FragCoord.y)) % 2 == 0)
+                discard;
+            FragColor = uFlatColor;
+            return;
+        }
+
         FragColor = color;
         return;
     }

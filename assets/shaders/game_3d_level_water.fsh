@@ -10,7 +10,7 @@ uniform float uTime;
 out vec4 FragColor;
 
 void main() {
-    vec4 color = vec4(texture(uTexture, vUVCoords + vec2(0.0, uTime * 2.0)));
+    vec4 color = vec4(texture(uTexture, vUVCoords - vec2(0.0, uTime * 2.0)));
 
     if (color.a == 0.0)
         discard;
