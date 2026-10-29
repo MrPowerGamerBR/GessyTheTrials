@@ -11,8 +11,8 @@ val lwjglNatives = "natives-linux"
 
 dependencies {
     implementation(project(":gessythetrials-common"))
-    implementation("net.perfectdreams.harmony:harmony-gl:0.0.2")
-    implementation("net.perfectdreams.harmony:harmony-opengl-lwjgl:0.0.2")
+    implementation(libs.harmony.gl)
+    implementation(libs.harmony.openglLwjgl)
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0")
 
     implementation(platform("org.lwjgl:lwjgl-bom:$lwjglVersion"))

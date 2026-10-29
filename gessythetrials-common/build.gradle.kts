@@ -17,7 +17,7 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-                implementation("net.perfectdreams.harmony:harmony-gl:0.0.2")
+                implementation(libs.harmony.gl)
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.12.0")
             }
         }
