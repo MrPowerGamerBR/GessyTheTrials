@@ -7,6 +7,6 @@ class Level3DWaterShader(gl: GLContext, programId: Int) : ShaderProgram(gl, prog
     val uProjection = uniformMatrix4fv("uProjection")
     val uView = uniformMatrix4fv("uView")
     val uModel = uniformMatrix4fv("uModel")
-    val uTexture = uniform1Sampler2D("uTexture")
+    val uTexture = uniformSampler2D("uTexture")
     val uTime = uniform1f("uTime")
 }
