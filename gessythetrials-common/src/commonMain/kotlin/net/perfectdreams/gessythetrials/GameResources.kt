@@ -29,6 +29,8 @@ import net.perfectdreams.harmony.gl.GLConstants.GL_TEXTURE_WRAP_S
 import net.perfectdreams.harmony.gl.GLConstants.GL_TEXTURE_WRAP_T
 import net.perfectdreams.harmony.gl.GLConstants.GL_UNSIGNED_BYTE
 import net.perfectdreams.harmony.gl.GLContext
+import net.perfectdreams.harmony.gl.GLTexture
+import net.perfectdreams.harmony.gl.GLVertexArrayObject
 import net.perfectdreams.harmony.gl.GPUResources
 import net.perfectdreams.harmony.gl.textures.Texture
 import net.perfectdreams.oldharmony.gl.meshes.MeshRenderingState
@@ -45,8 +47,8 @@ class GameResources(
     val collisionTexture: Texture,
     val waterTexture: Texture,
     val fontTexture: Texture,
-    val skyboxTextureId: Int,
-    val skyboxCubeVAO: Int,
+    val skyboxTextureId: GLTexture,
+    val skyboxCubeVAO: GLVertexArrayObject,
     val fontCharacters: Map<Char, FontCharacter>,
     val shader3d: Default3DShader,
     val shader2d: Default2DShader,
@@ -192,7 +194,7 @@ class GameResources(
             )
         }
 
-        private fun createCubeVAO(gl: GLContext): Int {
+        private fun createCubeVAO(gl: GLContext): GLVertexArrayObject {
             // positions: vec3
             val quadVertices = floatArrayOf(
                 // positions
@@ -256,7 +258,7 @@ class GameResources(
             return quadVAO
         }
 
-        private suspend fun loadCubemap(gl: GLContext, textureManager: TextureManager): Int {
+        private suspend fun loadCubemap(gl: GLContext, textureManager: TextureManager): GLTexture {
             val faces = arrayOf(
                 "right.jpg",
                 "left.jpg",

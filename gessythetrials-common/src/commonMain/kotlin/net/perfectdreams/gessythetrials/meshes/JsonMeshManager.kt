@@ -11,6 +11,8 @@ import net.perfectdreams.harmony.gl.GLConstants.GL_STATIC_DRAW
 import net.perfectdreams.harmony.gl.GLContext
 import net.perfectdreams.oldharmony.gl.meshes.MeshRenderingState
 import com.mrpowergamerbr.starfait.Matrix4f
+import net.perfectdreams.harmony.gl.GLBuffer
+import net.perfectdreams.harmony.gl.GLVertexArrayObject
 
 class JsonMeshManager(val gl: GLContext) {
     // This variation loads a mesh, but won't assign any bones for any of the vertices
@@ -109,7 +111,7 @@ class JsonMeshManager(val gl: GLContext) {
         gl.bindVertexArray(quadVAO)
 
         // Generate four VBOs
-        val vbosArray = IntArray(4) { gl.genBuffers() }
+        val vbosArray = Array<GLBuffer>(4) { gl.genBuffers() }
 
         // Position VBO
         gl.enableVertexAttribArray(0)
@@ -137,8 +139,8 @@ class JsonMeshManager(val gl: GLContext) {
         gl.vertexAttribPointer(3, 3, GL_FLOAT, false, 0, 0)
 
         // Unbind
-        gl.bindBuffer(GL_ARRAY_BUFFER, 0)
-        gl.bindVertexArray(0)
+        gl.bindBuffer(GL_ARRAY_BUFFER, null)
+        gl.bindVertexArray(null)
         gl.disableVertexAttribArray(3)
         gl.disableVertexAttribArray(2)
         gl.disableVertexAttribArray(1)
@@ -198,8 +200,8 @@ class JsonMeshManager(val gl: GLContext) {
         gl.enableVertexAttribArray(1)
 
         // Unbind the VBO and VAO to prevent accidental modification
-        gl.bindBuffer(GL_ARRAY_BUFFER, 0)
-        gl.bindVertexArray(0)
+        gl.bindBuffer(GL_ARRAY_BUFFER, null)
+        gl.bindVertexArray(null)
 
         return MeshRenderingState(gl, screenQuadVao, 6)
     }
@@ -247,7 +249,7 @@ class JsonMeshManager(val gl: GLContext) {
         gl.bindVertexArray(quadVAO)
 
         // Generate one VBO
-        val vbosArray = IntArray(1) { gl.genBuffers() }
+        val vbosArray = Array<GLBuffer>(1) { gl.genBuffers() }
 
         // Position VBO
         gl.enableVertexAttribArray(0)
@@ -262,8 +264,8 @@ class JsonMeshManager(val gl: GLContext) {
         gl.vertexAttribPointer(1, 2, GL_FLOAT, false, 4 * Float.SIZE_BYTES, 2L * Float.SIZE_BYTES)
 
         // Unbind
-        gl.bindBuffer(GL_ARRAY_BUFFER, 0)
-        gl.bindVertexArray(0)
+        gl.bindBuffer(GL_ARRAY_BUFFER, null)
+        gl.bindVertexArray(null)
         gl.disableVertexAttribArray(1)
         gl.disableVertexAttribArray(0)
 
@@ -385,7 +387,7 @@ class JsonMeshManager(val gl: GLContext) {
         gl.bindVertexArray(quadVAO)
 
         // Generate four VBOs
-        val vbosArray = IntArray(4) { gl.genBuffers() }
+        val vbosArray = Array<GLBuffer>(4) { gl.genBuffers() }
 
         // Position VBO
         gl.enableVertexAttribArray(0)
@@ -413,8 +415,8 @@ class JsonMeshManager(val gl: GLContext) {
         gl.vertexAttribPointer(3, 3, GL_FLOAT, false, 0, 0)
 
         // Unbind
-        gl.bindBuffer(GL_ARRAY_BUFFER, 0)
-        gl.bindVertexArray(0)
+        gl.bindBuffer(GL_ARRAY_BUFFER, null)
+        gl.bindVertexArray(null)
         gl.disableVertexAttribArray(2)
         gl.disableVertexAttribArray(1)
         gl.disableVertexAttribArray(0)
@@ -537,7 +539,7 @@ class JsonMeshManager(val gl: GLContext) {
         gl.bindVertexArray(quadVAO)
 
         // Generate four VBOs
-        val vbosArray = IntArray(1) { gl.genBuffers() }
+        val vbosArray = Array<GLBuffer>(1) { gl.genBuffers() }
 
         // Position VBO
         gl.enableVertexAttribArray(0)
@@ -631,7 +633,7 @@ class JsonMeshManager(val gl: GLContext) {
                 gl.bindVertexArray(quadVAO)
 
                 // Generate three VBOs
-                val vbosArray = IntArray(3) { gl.genBuffers() }
+                val vbosArray = Array<GLBuffer>(3) { gl.genBuffers() }
 
                 // Position VBO
                 gl.enableVertexAttribArray(0)
@@ -652,8 +654,8 @@ class JsonMeshManager(val gl: GLContext) {
                 gl.vertexAttribPointer(2, 3, GL_FLOAT, false, 0, 0)
 
                 // Unbind
-                gl.bindBuffer(GL_ARRAY_BUFFER, 0)
-                gl.bindVertexArray(0)
+                gl.bindBuffer(GL_ARRAY_BUFFER, null)
+                gl.bindVertexArray(null)
 
                 meshMaterialMap[material] = MeshRenderingState(gl, quadVAO, filteredMeshFaces.size * 3)
             }
