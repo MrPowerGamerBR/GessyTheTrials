@@ -15,7 +15,6 @@ import net.perfectdreams.gessythetrials.skeletons.AnimationBone
 import net.perfectdreams.gessythetrials.skeletons.Skeleton
 import net.perfectdreams.harmony.gl.GLConstants.GL_ARRAY_BUFFER
 import net.perfectdreams.harmony.gl.GLConstants.GL_CLAMP_TO_EDGE
-import net.perfectdreams.harmony.gl.GLConstants.GL_FLOAT
 import net.perfectdreams.harmony.gl.GLConstants.GL_LINEAR
 import net.perfectdreams.harmony.gl.GLConstants.GL_NEAREST
 import net.perfectdreams.harmony.gl.GLConstants.GL_RGBA
@@ -33,6 +32,7 @@ import net.perfectdreams.harmony.gl.GLTexture
 import net.perfectdreams.harmony.gl.GLVertexArrayObject
 import net.perfectdreams.harmony.render.RenderDevice
 import net.perfectdreams.harmony.render.textures.Texture
+import net.perfectdreams.harmony.render.vertex.buildVertexAttributes
 import net.perfectdreams.oldharmony.gl.meshes.MeshRenderingState
 
 class GameResources(
@@ -249,11 +249,9 @@ class GameResources(
             val vboId = gl.genBuffers()
 
             // Position VBO
-            gl.enableVertexAttribArray(0)
             gl.bindBuffer(GL_ARRAY_BUFFER, vboId)
             gl.bufferData(GL_ARRAY_BUFFER, quadVertices, GL_STATIC_DRAW)
-            gl.vertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0)
-            // glDisableVertexAttribArray(0)
+            buildVertexAttributes { vec3(0) }.apply(gl)
 
             return quadVAO
         }

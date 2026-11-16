@@ -5,14 +5,13 @@ import net.perfectdreams.gessythetrials.FontCharacter
 import net.perfectdreams.gessythetrials.skeletons.NewBone
 import net.perfectdreams.gessythetrials.skeletons.Skeleton
 import net.perfectdreams.harmony.gl.GLConstants.GL_ARRAY_BUFFER
-import net.perfectdreams.harmony.gl.GLConstants.GL_FLOAT
-import net.perfectdreams.harmony.gl.GLConstants.GL_INT
 import net.perfectdreams.harmony.gl.GLConstants.GL_STATIC_DRAW
 import net.perfectdreams.harmony.gl.GLContext
 import net.perfectdreams.oldharmony.gl.meshes.MeshRenderingState
 import com.mrpowergamerbr.starfait.Matrix4f
 import net.perfectdreams.harmony.gl.GLBuffer
 import net.perfectdreams.harmony.gl.GLVertexArrayObject
+import net.perfectdreams.harmony.render.vertex.buildVertexAttributes
 
 class JsonMeshManager(val gl: GLContext) {
     // This variation loads a mesh, but won't assign any bones for any of the vertices
@@ -113,38 +112,32 @@ class JsonMeshManager(val gl: GLContext) {
         // Generate four VBOs
         val vbosArray = Array<GLBuffer>(4) { gl.genBuffers() }
 
+        // Each attribute has its own VBO, so each VBO gets its own vertex attributes
+        // The attributes MUST be applied while their VBO is bound!
+
         // Position VBO
-        gl.enableVertexAttribArray(0)
         gl.bindBuffer(GL_ARRAY_BUFFER, vbosArray[0])
         gl.bufferData(GL_ARRAY_BUFFER, vertices, GL_STATIC_DRAW)
-        gl.vertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0)
+        buildVertexAttributes { vec3(0) }.apply(gl)
 
         // Texture Coordinates VBO
-        gl.enableVertexAttribArray(1)
         gl.bindBuffer(GL_ARRAY_BUFFER, vbosArray[1])
         gl.bufferData(GL_ARRAY_BUFFER, textureCoordinates, GL_STATIC_DRAW)
-        gl.vertexAttribPointer(1, 2, GL_FLOAT, false, 0, 0)
+        buildVertexAttributes { vec2(1) }.apply(gl)
 
         // Vertex Bones VBO
-        gl.enableVertexAttribArray(2)
         gl.bindBuffer(GL_ARRAY_BUFFER, vbosArray[2])
         gl.bufferData(GL_ARRAY_BUFFER, vertexBoneIds, GL_STATIC_DRAW)
-        // YES WE NEED TO USE glVertexAttribIPointer FOR GL_INT!!!
-        gl.vertexAttribIPointer(2, 1, GL_INT, 0, 0)
+        buildVertexAttributes { int(2) }.apply(gl)
 
         // Normals VBO
-        gl.enableVertexAttribArray(3)
         gl.bindBuffer(GL_ARRAY_BUFFER, vbosArray[3])
         gl.bufferData(GL_ARRAY_BUFFER, normals, GL_STATIC_DRAW)
-        gl.vertexAttribPointer(3, 3, GL_FLOAT, false, 0, 0)
+        buildVertexAttributes { vec3(3) }.apply(gl)
 
         // Unbind
         gl.bindBuffer(GL_ARRAY_BUFFER, null)
         gl.bindVertexArray(null)
-        gl.disableVertexAttribArray(3)
-        gl.disableVertexAttribArray(2)
-        gl.disableVertexAttribArray(1)
-        gl.disableVertexAttribArray(0)
 
         return MeshRenderingState(gl, quadVAO, meshModel.faces.size * 3)
     }
@@ -177,27 +170,10 @@ class JsonMeshManager(val gl: GLContext) {
         gl.bindBuffer(GL_ARRAY_BUFFER, vbo)
         gl.bufferData(GL_ARRAY_BUFFER, quadVertices, GL_STATIC_DRAW)
 
-        // Index: The index of the vertex attribute
-        // Size: The size of each entry
-        // Type: The type
-        // Normalized: Whether the data should be normalized
-        // Stride: The byte offset between consecutive attributes
-        // Pointer: Where the data is in the array
-
-        // So, as an example...
-        // For something with size 2 (two floats) in a array that has vec2 (pos), vec2 (uv)
-        // If we want to access the second vec2, we would need to...
-        // size = 2 (because each entry is 2 floats)
-        // stride = 4 * Float.SIZE_BYTES (because each entry is [entry], *8 bytes for the pos*, [entry] ...), the stride is relative to the START of the vertex!
-        // pointer = the data starts at 2 * Float.SIZE_BYTES
-
-        // Position attribute
-        gl.vertexAttribPointer(0, 2, GL_FLOAT, false, 4 * Float.SIZE_BYTES, 0)
-        gl.enableVertexAttribArray(0)
-
-        // UV attribute
-        gl.vertexAttribPointer(1, 2, GL_FLOAT, false, 4 * Float.SIZE_BYTES, 2 * Float.SIZE_BYTES.toLong())
-        gl.enableVertexAttribArray(1)
+        buildVertexAttributes {
+            vec2(0) // Position
+            vec2(1) // UV
+        }.apply(gl)
 
         // Unbind the VBO and VAO to prevent accidental modification
         gl.bindBuffer(GL_ARRAY_BUFFER, null)
@@ -251,23 +227,16 @@ class JsonMeshManager(val gl: GLContext) {
         // Generate one VBO
         val vbosArray = Array<GLBuffer>(1) { gl.genBuffers() }
 
-        // Position VBO
-        gl.enableVertexAttribArray(0)
         gl.bindBuffer(GL_ARRAY_BUFFER, vbosArray[0])
         gl.bufferData(GL_ARRAY_BUFFER, quadData, GL_STATIC_DRAW)
-        gl.vertexAttribPointer(0, 2, GL_FLOAT, false, 4 * Float.SIZE_BYTES, 0)
-
-        // Texture Coordinates VBO
-        gl.enableVertexAttribArray(1)
-        gl.bindBuffer(GL_ARRAY_BUFFER, vbosArray[0])
-        gl.bufferData(GL_ARRAY_BUFFER, quadData, GL_STATIC_DRAW)
-        gl.vertexAttribPointer(1, 2, GL_FLOAT, false, 4 * Float.SIZE_BYTES, 2L * Float.SIZE_BYTES)
+        buildVertexAttributes {
+            vec2(0) // Position
+            vec2(1) // UV
+        }.apply(gl)
 
         // Unbind
         gl.bindBuffer(GL_ARRAY_BUFFER, null)
         gl.bindVertexArray(null)
-        gl.disableVertexAttribArray(1)
-        gl.disableVertexAttribArray(0)
 
         return MeshRenderingState(gl, quadVAO, meshModel.faces.size * 3)
     }
@@ -389,37 +358,32 @@ class JsonMeshManager(val gl: GLContext) {
         // Generate four VBOs
         val vbosArray = Array<GLBuffer>(4) { gl.genBuffers() }
 
+        // Each attribute has its own VBO, so each VBO gets its own vertex attributes
+        // The attributes MUST be applied while their VBO is bound!
+
         // Position VBO
-        gl.enableVertexAttribArray(0)
         gl.bindBuffer(GL_ARRAY_BUFFER, vbosArray[0])
         gl.bufferData(GL_ARRAY_BUFFER, vertices, GL_STATIC_DRAW)
-        gl.vertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0)
+        buildVertexAttributes { vec3(0) }.apply(gl)
 
         // Texture Coordinates VBO
-        gl.enableVertexAttribArray(1)
         gl.bindBuffer(GL_ARRAY_BUFFER, vbosArray[1])
         gl.bufferData(GL_ARRAY_BUFFER, textureCoordinates, GL_STATIC_DRAW)
-        gl.vertexAttribPointer(1, 2, GL_FLOAT, false, 0, 0)
+        buildVertexAttributes { vec2(1) }.apply(gl)
 
         // Vertex Bones VBO
-        gl.enableVertexAttribArray(2)
         gl.bindBuffer(GL_ARRAY_BUFFER, vbosArray[2])
         gl.bufferData(GL_ARRAY_BUFFER, vertexBoneIds, GL_STATIC_DRAW)
-        // YES WE NEED TO USE glVertexAttribIPointer FOR GL_INT!!!
-        gl.vertexAttribIPointer(2, 1, GL_INT, 0, 0)
+        buildVertexAttributes { int(2) }.apply(gl)
 
         // Normals VBO
-        gl.enableVertexAttribArray(3)
         gl.bindBuffer(GL_ARRAY_BUFFER, vbosArray[3])
         gl.bufferData(GL_ARRAY_BUFFER, normals, GL_STATIC_DRAW)
-        gl.vertexAttribPointer(3, 3, GL_FLOAT, false, 0, 0)
+        buildVertexAttributes { vec3(3) }.apply(gl)
 
         // Unbind
         gl.bindBuffer(GL_ARRAY_BUFFER, null)
         gl.bindVertexArray(null)
-        gl.disableVertexAttribArray(2)
-        gl.disableVertexAttribArray(1)
-        gl.disableVertexAttribArray(0)
 
         // Skeleton tidbits
         val globalBindTransformsMatrices = mutableMapOf<String, Matrix4f>()
@@ -542,11 +506,9 @@ class JsonMeshManager(val gl: GLContext) {
         val vbosArray = Array<GLBuffer>(1) { gl.genBuffers() }
 
         // Position VBO
-        gl.enableVertexAttribArray(0)
         gl.bindBuffer(GL_ARRAY_BUFFER, vbosArray[0])
         gl.bufferData(GL_ARRAY_BUFFER, vertices, GL_STATIC_DRAW)
-        gl.vertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0)
-        gl.disableVertexAttribArray(0)
+        buildVertexAttributes { vec3(0) }.apply(gl)
 
         return MeshRenderingState(gl, quadVAO, 36)
     }
@@ -635,23 +597,23 @@ class JsonMeshManager(val gl: GLContext) {
                 // Generate three VBOs
                 val vbosArray = Array<GLBuffer>(3) { gl.genBuffers() }
 
+                // Each attribute has its own VBO, so each VBO gets its own vertex attributes
+                // The attributes MUST be applied while their VBO is bound!
+
                 // Position VBO
-                gl.enableVertexAttribArray(0)
                 gl.bindBuffer(GL_ARRAY_BUFFER, vbosArray[0])
                 gl.bufferData(GL_ARRAY_BUFFER, vertices, GL_STATIC_DRAW)
-                gl.vertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0)
+                buildVertexAttributes { vec3(0) }.apply(gl)
 
                 // Texture Coordinates VBO
-                gl.enableVertexAttribArray(1)
                 gl.bindBuffer(GL_ARRAY_BUFFER, vbosArray[1])
                 gl.bufferData(GL_ARRAY_BUFFER, textureCoordinates, GL_STATIC_DRAW)
-                gl.vertexAttribPointer(1, 2, GL_FLOAT, false, 0, 0)
+                buildVertexAttributes { vec2(1) }.apply(gl)
 
                 // Normals VBO
-                gl.enableVertexAttribArray(2)
                 gl.bindBuffer(GL_ARRAY_BUFFER, vbosArray[2])
                 gl.bufferData(GL_ARRAY_BUFFER, normals, GL_STATIC_DRAW)
-                gl.vertexAttribPointer(2, 3, GL_FLOAT, false, 0, 0)
+                buildVertexAttributes { vec3(2) }.apply(gl)
 
                 // Unbind
                 gl.bindBuffer(GL_ARRAY_BUFFER, null)
@@ -660,11 +622,6 @@ class JsonMeshManager(val gl: GLContext) {
                 meshMaterialMap[material] = MeshRenderingState(gl, quadVAO, filteredMeshFaces.size * 3)
             }
         }
-
-        gl.disableVertexAttribArray(3)
-        gl.disableVertexAttribArray(2)
-        gl.disableVertexAttribArray(1)
-        gl.disableVertexAttribArray(0)
 
         return meshMaterialMap
     }
