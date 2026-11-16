@@ -19,7 +19,6 @@ import org.lwjgl.glfw.Callbacks.glfwFreeCallbacks
 import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.glfw.GLFWErrorCallback
 import org.lwjgl.glfw.GLFWVidMode
-import org.lwjgl.glfw.GLFWWindowSizeCallbackI
 import org.lwjgl.opengl.GL
 import org.lwjgl.opengl.GL11.glPolygonMode
 import org.lwjgl.system.MemoryStack.stackPush
@@ -108,12 +107,6 @@ class GessyTheTrialsLWJGL {
             )
         }
 
-        glfwSetWindowSizeCallback(window, object : GLFWWindowSizeCallbackI {
-            override fun invoke(window: Long, width: Int, height: Int) {
-                gl.viewport(0, 0, width, height)
-            }
-        })
-
         // Make the OpenGL context current
         glfwMakeContextCurrent(window)
         // Enable v-sync
@@ -141,6 +134,17 @@ class GessyTheTrialsLWJGL {
 
         val resources = runBlocking { GameResources.load(gl, device, textureManager, vfs) }
         this.game = GessyTheTrials(gl, device, resources)
+
+        // We use the framebuffer size instead of the window size because the viewport is in pixels, and on HiDPI displays the window size is in screen coordinates
+        // We don't need to set the viewport here because onRenderTarget sets it from the WindowRenderTarget size every frame
+        glfwSetFramebufferSizeCallback(window) { _, width, height -> game.windowRenderTarget.resize(width, height) }
+
+        stackPush().use { stack ->
+            val framebufferWidth = stack.mallocInt(1)
+            val framebufferHeight = stack.mallocInt(1)
+            glfwGetFramebufferSize(window, framebufferWidth, framebufferHeight)
+            game.windowRenderTarget.resize(framebufferWidth.get(0), framebufferHeight.get(0))
+        }
 
         // Run the rendering loop until the user has attempted to close
         while (!glfwWindowShouldClose(window)) {
