@@ -129,9 +129,6 @@ class GessyTheTrialsLWJGL {
         val vfs = loadVirtualFileSystem(File("assets"))
         val textureManager = LWJGLTextureManager(device, vfs)
 
-        // Set the clear color
-        gl.clearColor(0.2f, 0.2f, 0.2f, 1.0f)
-
         val resources = runBlocking { GameResources.load(gl, device, textureManager, vfs) }
         this.game = GessyTheTrials(gl, device, resources)
 

@@ -66,9 +66,6 @@ class GessyTheTrialsWebGL2(val vfs: VirtualFileSystem) {
             this@GessyTheTrialsWebGL2.game = GessyTheTrials(gl, device, resources)
             this@GessyTheTrialsWebGL2.game.windowRenderTarget.resize(webgl2.drawingBufferWidth, webgl2.drawingBufferHeight)
 
-            // Set the clear color
-            gl.clearColor(0.2f, 0.2f, 0.2f, 1.0f)
-
             fun render() {
                 game.render()
 

@@ -24,6 +24,8 @@ import net.perfectdreams.harmony.render.pipelines.PipelineScope
 import net.perfectdreams.harmony.render.textures.Texture
 import net.perfectdreams.harmony.render.batcher.SpriteBatcher
 import net.perfectdreams.harmony.render.batcher.withSpritePipeline
+import net.perfectdreams.harmony.render.pipelines.BlendState
+import net.perfectdreams.harmony.render.rendertarget.ClearOptions
 import net.perfectdreams.harmony.render.rendertarget.WindowRenderTarget
 import net.perfectdreams.oldharmony.gl.input.Key
 import net.perfectdreams.oldharmony.gl.input.Keyboard
@@ -72,11 +74,6 @@ class GessyTheTrials(
 
         if (accumulatedTime > MAX_ACCUMULATED_TIME)
             accumulatedTime = MAX_ACCUMULATED_TIME
-
-        gl.enable(GL_DEPTH_TEST)
-        gl.enable(GL_BLEND)
-        gl.blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-        gl.clear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
 
         while (accumulatedTime >= TICK_DURATION) {
             if (keyboard.isPressing(Key.W)) {
@@ -176,7 +173,7 @@ class GessyTheTrials(
         val screenProjectionMatrix = Matrix4f()
             .ortho(0.0f, 1280f, 720f, 0.0f, -1.0f, 1.0f)
 
-        device.onRenderTarget(windowRenderTarget) {
+        device.onRenderTarget(windowRenderTarget, clear = ClearOptions(color = ClearOptions.Color(0.2f, 0.2f, 0.2f, 1.0f), depth = 1f)) {
             // The best way would be by rendering the skybox AFTER the 3d objects, to avoid unnecessarily rendering the skybox where objects are in front
             // However, this does cause issues with transparent objects (like gessy's whiskers)
             withPipeline(Pipeline(resources.shaderSkybox, depth = DepthState(write = true, compare = CompareFunc.LESS_THAN_OR_EQUAL))) {
@@ -227,7 +224,7 @@ class GessyTheTrials(
 
             // Debug collision sphere
             if (false) {
-                withPipeline(Pipeline(resources.shader3d, depth = null)) {
+                withPipeline(Pipeline(resources.shader3d, depth = null, blend = BlendState.AlphaBlending)) {
                     this.shader.uModel.set(
                         Matrix4f()
                             .translate(player.position.x, player.position.y + SPHERE_RADIUS, player.position.z)
@@ -354,8 +351,6 @@ class GessyTheTrials(
             }
 
             withSpritePipeline(batcher, resources.shader2d) {
-                gl.clear(GL_DEPTH_BUFFER_BIT)
-
                 this.shader.uProjection.set(screenProjectionMatrix.get(FloatArray(16)))
                 this.shader.uView.set(Matrix4f().get(FloatArray(16)))
                 this.shader.uTexture.set(0, resources.fontTexture)
