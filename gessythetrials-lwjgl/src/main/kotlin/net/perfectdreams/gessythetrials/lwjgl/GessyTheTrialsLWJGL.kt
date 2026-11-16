@@ -8,7 +8,7 @@ import net.perfectdreams.gessythetrials.lwjgl.textures.LWJGLTextureManager
 import net.perfectdreams.harmony.gl.GLConstants.GL_FILL
 import net.perfectdreams.harmony.gl.GLConstants.GL_FRONT_AND_BACK
 import net.perfectdreams.harmony.gl.GLConstants.GL_LINE
-import net.perfectdreams.harmony.gl.GPUResources
+import net.perfectdreams.harmony.render.RenderDevice
 import net.perfectdreams.harmony.gl.opengl.OpenGLContext
 import net.perfectdreams.harmony.gl.opengl.OpenGLDebugging
 import net.perfectdreams.harmony.logging.HarmonyLoggerFactory
@@ -132,15 +132,15 @@ class GessyTheTrialsLWJGL {
         GL.createCapabilities()
         OpenGLDebugging.enableReportGLErrors()
 
-        val gpu = GPUResources(gl, 1280, 720)
+        val device = RenderDevice(gl)
         val vfs = loadVirtualFileSystem(File("assets"))
-        val textureManager = LWJGLTextureManager(gpu, vfs)
+        val textureManager = LWJGLTextureManager(device, vfs)
 
         // Set the clear color
         gl.clearColor(0.2f, 0.2f, 0.2f, 1.0f)
 
-        val resources = runBlocking { GameResources.load(gl, gpu, textureManager, vfs) }
-        this.game = GessyTheTrials(gl, gpu, resources)
+        val resources = runBlocking { GameResources.load(gl, device, textureManager, vfs) }
+        this.game = GessyTheTrials(gl, device, resources)
 
         // Run the rendering loop until the user has attempted to close
         while (!glfwWindowShouldClose(window)) {

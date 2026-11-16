@@ -31,8 +31,8 @@ import net.perfectdreams.harmony.gl.GLConstants.GL_UNSIGNED_BYTE
 import net.perfectdreams.harmony.gl.GLContext
 import net.perfectdreams.harmony.gl.GLTexture
 import net.perfectdreams.harmony.gl.GLVertexArrayObject
-import net.perfectdreams.harmony.gl.GPUResources
-import net.perfectdreams.harmony.gl.textures.Texture
+import net.perfectdreams.harmony.render.RenderDevice
+import net.perfectdreams.harmony.render.textures.Texture
 import net.perfectdreams.oldharmony.gl.meshes.MeshRenderingState
 
 class GameResources(
@@ -65,7 +65,7 @@ class GameResources(
     companion object {
         suspend fun load(
             gl: GLContext,
-            gpu: GPUResources,
+            device: RenderDevice,
             textureManager: TextureManager,
             vfs: VirtualFileSystem
         ): GameResources {
@@ -124,30 +124,30 @@ class GameResources(
 
             val fontCharacters = meshManager.createFontAtlas()
 
-            val shader3d = gpu.createShader(
+            val shader3d = device.createShader(
                 vfs.readText("shaders/game_3d.vsh"),
                 vfs.readText("shaders/game_3d.fsh"),
                 ::Default3DShader
             )
 
-            val shader2d = gpu.createShader(
+            val shader2d = device.createShader(
                 vfs.readText("shaders/game_2d.vsh"),
                 vfs.readText("shaders/game_2d.fsh"),
                 ::Default2DShader
             )
 
-            val shader3dLevel = gpu.createShader(
+            val shader3dLevel = device.createShader(
                 vfs.readText("shaders/game_3d_level.vsh"),
                 vfs.readText("shaders/game_3d_level.fsh"),
                 ::Level3DShader
             )
-            val shader3dLevelWater = gpu.createShader(
+            val shader3dLevelWater = device.createShader(
                 vfs.readText("shaders/game_3d_level.vsh"),
                 vfs.readText("shaders/game_3d_level_water.fsh"),
                 ::Level3DWaterShader
             )
 
-            val shaderSkybox = gpu.createShader(
+            val shaderSkybox = device.createShader(
                 vfs.readText("shaders/skybox.vsh"),
                 vfs.readText("shaders/skybox.fsh"),
                 ::SkyboxShader

@@ -6,7 +6,7 @@ import net.perfectdreams.gessythetrials.GameResources
 import net.perfectdreams.gessythetrials.GessyTheTrials
 import net.perfectdreams.gessythetrials.VirtualFileSystem
 import net.perfectdreams.gessythetrials.webgl2.textures.WebTextureManager
-import net.perfectdreams.harmony.gl.GPUResources
+import net.perfectdreams.harmony.render.RenderDevice
 import net.perfectdreams.harmony.gl.webgl2.WebGL2Context
 import net.perfectdreams.oldharmony.gl.input.Key
 import web.animations.requestAnimationFrame
@@ -58,12 +58,13 @@ class GessyTheTrialsWebGL2(val vfs: VirtualFileSystem) {
         }
 
         val gl = WebGL2Context(webgl2)
-        val gpu = GPUResources(gl, webgl2.drawingBufferWidth, webgl2.drawingBufferHeight)
-        val textureManager = WebTextureManager(gpu, vfs)
+        val device = RenderDevice(gl)
+        val textureManager = WebTextureManager(device, vfs)
 
         GlobalScope.launch {
-            val resources = GameResources.load(gl, gpu, textureManager, vfs)
-            this@GessyTheTrialsWebGL2.game = GessyTheTrials(gl, gpu, resources)
+            val resources = GameResources.load(gl, device, textureManager, vfs)
+            this@GessyTheTrialsWebGL2.game = GessyTheTrials(gl, device, resources)
+            this@GessyTheTrialsWebGL2.game.windowRenderTarget.resize(webgl2.drawingBufferWidth, webgl2.drawingBufferHeight)
 
             // Set the clear color
             gl.clearColor(0.2f, 0.2f, 0.2f, 1.0f)

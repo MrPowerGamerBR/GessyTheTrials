@@ -1,11 +1,11 @@
 package net.perfectdreams.gessythetrials
 
 import net.perfectdreams.harmony.gl.GLConstants
-import net.perfectdreams.harmony.gl.GPUResources
+import net.perfectdreams.harmony.render.RenderDevice
 import net.perfectdreams.harmony.gl.TextureSource
-import net.perfectdreams.harmony.gl.textures.Texture
+import net.perfectdreams.harmony.render.textures.Texture
 
-abstract class TextureManager(val gpu: GPUResources) {
+abstract class TextureManager(val device: RenderDevice) {
     /**
      * Decodes the image at [filePath] into a RGBA [TextureSource], without uploading it to the GPU
      */
@@ -15,7 +15,7 @@ abstract class TextureManager(val gpu: GPUResources) {
         filePath: String,
         textureInterpolationType: Int
     ): Texture {
-        return gpu.createTexture(
+        return device.createTexture(
             loadTextureSource(filePath),
             GLConstants.GL_REPEAT,
             GLConstants.GL_REPEAT,

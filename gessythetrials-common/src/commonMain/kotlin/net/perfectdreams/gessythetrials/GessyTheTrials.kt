@@ -16,14 +16,15 @@ import net.perfectdreams.harmony.gl.GLConstants.GL_SRC_ALPHA
 import net.perfectdreams.harmony.gl.GLConstants.GL_TEXTURE0
 import net.perfectdreams.harmony.gl.GLConstants.GL_TEXTURE_CUBE_MAP
 import net.perfectdreams.harmony.gl.GLContext
-import net.perfectdreams.harmony.gl.GPUResources
-import net.perfectdreams.harmony.gl.pipelines.CompareFunc
-import net.perfectdreams.harmony.gl.pipelines.DepthState
-import net.perfectdreams.harmony.gl.pipelines.Pipeline
-import net.perfectdreams.harmony.gl.pipelines.PipelineScope
-import net.perfectdreams.harmony.gl.textures.Texture
-import net.perfectdreams.harmony.graphics.batcher.SpriteBatcher
-import net.perfectdreams.harmony.graphics.batcher.withSpritePipeline
+import net.perfectdreams.harmony.render.RenderDevice
+import net.perfectdreams.harmony.render.pipelines.CompareFunc
+import net.perfectdreams.harmony.render.pipelines.DepthState
+import net.perfectdreams.harmony.render.pipelines.Pipeline
+import net.perfectdreams.harmony.render.pipelines.PipelineScope
+import net.perfectdreams.harmony.render.textures.Texture
+import net.perfectdreams.harmony.render.batcher.SpriteBatcher
+import net.perfectdreams.harmony.render.batcher.withSpritePipeline
+import net.perfectdreams.harmony.render.rendertarget.WindowRenderTarget
 import net.perfectdreams.oldharmony.gl.input.Key
 import net.perfectdreams.oldharmony.gl.input.Keyboard
 import kotlin.math.cos
@@ -31,7 +32,7 @@ import kotlin.math.sin
 
 class GessyTheTrials(
     val gl: GLContext,
-    val gpu: GPUResources,
+    val device: RenderDevice,
     val resources: GameResources
 ) {
     companion object {
@@ -44,6 +45,7 @@ class GessyTheTrials(
     val keyboard = Keyboard()
     private val player = Player()
     private val batcher = SpriteBatcher(gl)
+    val windowRenderTarget = WindowRenderTarget(1280, 720)
     private val startedAt = currentTimeMillis()
 
     // Timekeeping
@@ -174,7 +176,7 @@ class GessyTheTrials(
         val screenProjectionMatrix = Matrix4f()
             .ortho(0.0f, 1280f, 720f, 0.0f, -1.0f, 1.0f)
 
-        gpu.onRenderTarget(gpu.windowRenderTarget) {
+        device.onRenderTarget(windowRenderTarget) {
             // The best way would be by rendering the skybox AFTER the 3d objects, to avoid unnecessarily rendering the skybox where objects are in front
             // However, this does cause issues with transparent objects (like gessy's whiskers)
             withPipeline(Pipeline(resources.shaderSkybox, depth = DepthState(write = true, compare = CompareFunc.LESS_THAN_OR_EQUAL))) {
