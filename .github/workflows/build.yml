@@ -1,0 +1,68 @@
+name: Gessy The Trials
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-lwjgl-linux:
+    name: LWJGL (Linux x64)
+    runs-on: ubuntu-26.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Setup Java JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "21"
+          cache: "gradle"
+
+      - name: Build
+        env:
+          # GitHub Actions has 7GBs of available RAM for workers, so let's bump it a bit up!
+          GRADLE_OPTS: -Xmx4096m -Xms4096m
+        run: ./gradlew :gessythetrials-lwjgl:build :gessythetrials-lwjgl:installDist --no-daemon
+
+      # The game loads its assets from the "assets" folder in the working directory, so we bundle it with the distribution
+      - name: Copy assets to the distribution
+        run: cp -r assets gessythetrials-lwjgl/build/install/gessythetrials-lwjgl/assets
+
+      - name: Upload LWJGL distribution
+        uses: actions/upload-artifact@v4
+        with:
+          name: Gessy The Trials (LWJGL) (Linux x64)
+          path: gessythetrials-lwjgl/build/install/gessythetrials-lwjgl
+          if-no-files-found: error
+
+  build-webgl2:
+    name: WebGL2
+    runs-on: ubuntu-26.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Setup Java JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "21"
+          cache: "gradle"
+
+      - name: Build
+        env:
+          # GitHub Actions has 7GBs of available RAM for workers, so let's bump it a bit up!
+          GRADLE_OPTS: -Xmx4096m -Xms4096m
+        run: ./gradlew :gessythetrials-webgl2:build :gessythetrials-webgl2:jsBrowserDistribution --no-daemon
+
+      - name: Upload WebGL2 distribution
+        uses: actions/upload-artifact@v4
+        with:
+          name: Gessy The Trials (WebGL2)
+          path: gessythetrials-webgl2/build/dist/js/productionExecutable
+          if-no-files-found: error
